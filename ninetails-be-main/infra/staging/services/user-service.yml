@@ -1,0 +1,79 @@
+# Source: api/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: user-api
+  namespace: default
+  labels:
+    helm.sh/chart: api-0.1.0
+    app.kubernetes.io/name: api
+    app.kubernetes.io/instance: user
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+automountServiceAccountToken: true
+---
+# Source: api/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-api-service
+  namespace: default
+  labels:
+    helm.sh/chart: api-0.1.0
+    app.kubernetes.io/name: api
+    app.kubernetes.io/instance: user
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3000
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: api
+    app.kubernetes.io/instance: user
+---
+# Source: api/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-api
+  namespace: default
+  labels:
+    helm.sh/chart: api-0.1.0
+    app.kubernetes.io/name: api
+    app.kubernetes.io/instance: user
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: api
+      app.kubernetes.io/instance: user
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: api-0.1.0
+        app.kubernetes.io/name: api
+        app.kubernetes.io/instance: user
+        app.kubernetes.io/version: "1.16.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      serviceAccountName: user-api
+      containers:
+        - name: api
+          image: "ninetails-staging.kr.ncr.ntruss.com/user-service:staging"
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: ninetails-env
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          # resources:
+      imagePullSecrets:
+      - name: ninetails-staging

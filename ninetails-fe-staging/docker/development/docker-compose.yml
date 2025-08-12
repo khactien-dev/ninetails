@@ -1,0 +1,8 @@
+services:
+  ninetails-fe:
+    build:
+      context: ../../
+      dockerfile: docker/development/Dockerfile
+    image: localhost:5000/ninetails-fe:development
+    ports:
+      - '39001:3000'

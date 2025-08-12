@@ -1,0 +1,215 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - "3000:80"
+    volumes:
+      - ./config/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - user-api-service
+      - form-api-service
+      - location-api-service
+      - metric-api-service
+      - master-api-service
+    networks:
+      - ninetail-network
+  pgDb:
+    image: postgres:alpine
+    container_name: pgDb
+    volumes:
+     - ./docker/pgData:/var/lib/postgresql/data
+     - ./docker/export:/var/lib/postgresql/export
+    env_file:
+      - .dev.env
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=ninetails
+    ports:
+      - '5432:5432'
+    networks:
+      - ninetail-network
+  pgAdmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgAdmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=root
+    ports:
+      - '5050:80'
+    networks:
+      - ninetail-network
+  rabbitmq:
+    image: rabbitmq:3.13.4-management-alpine
+    container_name: rabbitmq
+    hostname: rabbitmq
+    ports:
+      - '5552:5552'
+      - '5672:5672'
+      - '15672:15672'
+    env_file:
+      - .dev.env
+    networks:
+      - ninetail-network
+    command: >
+      sh -c "
+        rabbitmq-plugins enable rabbitmq_stream rabbitmq_stream_management;
+        rabbitmq-server
+      "
+
+  opensearch:
+    image: opensearchproject/opensearch:latest
+    container_name: opensearch
+    env_file:
+      - .dev.env
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - opensearch:/usr/share/opensearch/data
+    ports:
+      - 9200:9200
+      - 9600:9600
+    networks:
+      - ninetail-network
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:latest
+    container_name: opensearch-dashboards
+    ports:
+      - 5601:5601
+    expose:
+      - "5601"
+    env_file:
+      - .dev.env
+    depends_on:
+      - opensearch
+    networks:
+     - ninetail-network
+
+  #start application
+  user-api-service:
+    container_name: user-api-service
+    image: user-service:latest
+    restart: always
+    build:
+      context: .
+      dockerfile: apps/user-service/Dockerfile.dev
+    volumes:
+      - ./apps:/usr/src/app/apps
+      - ./libs:/usr/src/app/libs
+    env_file:
+      - .dev.env
+    ports:
+      - '3001:3000'
+    depends_on:
+      - pgDb
+    networks:
+      - ninetail-network
+  form-api-service:
+    container_name: form-api-service
+    image: form-request-service:latest
+    restart: always
+    build:
+      context: .
+      dockerfile: apps/form-request-service/Dockerfile.dev
+    volumes:
+      - ./apps:/usr/src/app/apps
+      - ./libs:/usr/src/app/libs
+    env_file:
+      - .dev.env
+    ports:
+      - '3003:3000'
+    depends_on:
+      - pgDb
+    networks:
+      - ninetail-network
+  location-api-service:
+    container_name: location-api-service
+    image: location-service:latest
+    build:
+      context: .
+      dockerfile: apps/location-service/Dockerfile.dev
+    volumes:
+      - ./apps:/usr/src/app/apps
+      - ./libs:/usr/src/app/libs
+    env_file:
+      - .dev.env
+    ports:
+      - '3004:3000'
+    depends_on:
+      - pgDb
+    networks:
+      - ninetail-network
+  metric-api-service:
+    container_name: metric-api-service
+    image: base-metric-service:latest
+    restart: always
+    build:
+      context: .
+      dockerfile: apps/base-metric-service/Dockerfile.dev
+    volumes:
+      - ./apps:/usr/src/app/apps
+      - ./libs:/usr/src/app/libs
+    env_file:
+      - .dev.env
+    ports:
+      - '3005:3000'
+    depends_on:
+      - pgDb
+      - rabbitmq
+      - opensearch
+    networks:
+      - ninetail-network
+  notification-api-service:
+    container_name: notification-api-service
+    image: notification-service:latest
+    restart: always
+    build:
+      context: .
+      dockerfile: apps/notification-service/Dockerfile.dev
+    volumes:
+      - ./apps:/usr/src/app/apps
+      - ./libs:/usr/src/app/libs
+    env_file:
+      - .dev.env
+    ports:
+      - '3006:3000'
+    depends_on:
+      - pgDb
+      - rabbitmq
+      - opensearch
+    networks:
+      - ninetail-network
+  master-api-service:
+    container_name: master-service
+    image: master-service:latest
+    restart: always
+    build:
+      context: .
+      dockerfile: apps/master-service/Dockerfile.dev
+    volumes:
+      - ./apps:/usr/src/app/apps
+      - ./libs:/usr/src/app/libs
+      - ./docker/export:/var/lib/postgresql/export
+    env_file:
+      - .dev.env
+    ports:
+      - '3007:3000'
+    depends_on:
+      - pgDb
+    networks:
+      - ninetail-network
+
+volumes:
+  opensearch:
+
+networks:
+  ninetail-network:
+    driver: bridge

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <g id="그룹_22169" data-name="그룹 22169" transform="translate(-1749 -524)">
+    <g id="타원_251" data-name="타원 251" transform="translate(1750 525)" fill="#fff" stroke="#212121" stroke-width="1">
+      <circle cx="7" cy="7" r="7" stroke="none"/>
+      <circle cx="7" cy="7" r="6.5" fill="none"/>
+    </g>
+    <circle id="타원_252" data-name="타원 252" cx="3" cy="3" r="3" transform="translate(1754 529)" fill="#212121"/>
+    <g id="그룹_22166" data-name="그룹 22166" transform="translate(2)">
+      <rect id="사각형_9054" data-name="사각형 9054" width="2" height="3" transform="translate(1754 524)" fill="#212121"/>
+    </g>
+    <rect id="사각형_9055" data-name="사각형 9055" width="2" height="3" transform="translate(1756 537)" fill="#212121"/>
+    <g id="그룹_22168" data-name="그룹 22168" transform="translate(2289 -1223) rotate(90)">
+      <g id="그룹_22166-2" data-name="그룹 22166">
+        <rect id="사각형_9054-2" data-name="사각형 9054" width="2" height="3" transform="translate(1754 524)" fill="#212121"/>
+      </g>
+      <rect id="사각형_9055-2" data-name="사각형 9055" width="2" height="3" transform="translate(1754 537)" fill="#212121"/>
+    </g>
+  </g>
+</svg>

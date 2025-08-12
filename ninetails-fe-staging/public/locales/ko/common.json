@@ -1,0 +1,30 @@
+{
+  "title": "Wellcome Nextjs",
+  "login": "Login",
+  "register": "Register",
+  "email": "Email",
+  "password": "Password",
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "here": "here",
+  "forgotPass": "Forgot Password",
+  "confirmPassword": "Confirm Password",
+  "confirmPasswordError": "The two passwords that you entered do not match!",
+  "sider": {
+    "dashboard": "Dashboard",
+    "userManagement": "User Management",
+    "shipmentManagement": "Shipment Management",
+    "orderManagement": "Order Management",
+    "shipmentSetting": "Shipment Settings"
+  },
+  "header": {
+    "profile": "Profile",
+    "logout": "Logout",
+    "logoutSuccess": "You have logged out successfully!"
+  },
+  "validate": {
+    "requiredField": "이 필드는 필수입니다.",
+    "notValidEmail": "Invalid format email",
+    "max": "This field cannot exceed {{length}} characters"
+  }
+}

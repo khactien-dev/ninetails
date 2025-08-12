@@ -1,0 +1,154 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: opensearch-pv
+spec:
+  capacity:
+    storage: 20Gi  # Adjust size based on requirements
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: opensearch-storage
+  hostPath:
+    path: "/data/opensearch"  # Path on the host; adjust for your environment
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: opensearch-pvc
+spec:
+  storageClassName: opensearch-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opensearch-secret
+  labels:
+    app: opensearch
+data:
+  cluster.name: "opensearch-cluster"
+  node.name: "opensearch"
+  discovery.seed_hosts: "opensearch"
+  cluster.initial_cluster_manager_nodes: "opensearch"
+  bootstrap.memory_lock: "true"
+  OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+  DISABLE_INSTALL_DEMO_CONFIG: "true"
+  DISABLE_SECURITY_PLUGIN: "true"
+  OPENSEARCH_HOSTS: "http://opensearch:9200"
+  DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opensearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opensearch
+  template:
+    metadata:
+      labels:
+        app: opensearch
+      annotations:
+        "consul.hashicorp.com/connect-inject": 'false'
+    spec:
+      containers:
+        - name: opensearch
+          image: 'opensearchproject/opensearch:latest'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9200
+          volumeMounts:
+            - mountPath: /usr/share/opensearch/data
+              name: opensearch-data
+          env:
+            - name: cluster.name
+              value: "opensearch-cluster"
+            - name: node.name
+              value: "opensearch"
+            - name: discovery.seed_hosts
+              value: "opensearch"
+            - name: bootstrap.memory_lock
+              value: "true"
+            - name: OPENSEARCH_JAVA_OPTS
+              value: "-Xms512m -Xmx512m"
+            - name: DISABLE_INSTALL_DEMO_CONFIG
+              value: "true"
+            - name: DISABLE_SECURITY_PLUGIN
+              value: "true"
+            - name: discovery.type
+              value: "single-node"
+      volumes:
+        - name: opensearch-data
+          persistentVolumeClaim:
+            claimName: opensearch-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensearch
+  labels:
+    app: opensearch
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 9300
+      targetPort: 9200
+      protocol: TCP
+      name: http
+  selector:
+    app: opensearch
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opensearch-dashboard-deployment
+  labels:
+    app: opensearch-dashboard-deployment
+spec:
+  selector:
+    matchLabels:
+      app: opensearch-dashboard-deployment
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: opensearch-dashboard-deployment
+      annotations:
+        "consul.hashicorp.com/connect-inject": 'false'
+    spec:
+      containers:
+        - name: opensearch-dashboards
+          image: opensearchproject/opensearch-dashboards:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: OPENSEARCH_HOSTS
+              value: '["http://opensearch:9300"]'
+            - name: DISABLE_SECURITY_DASHBOARDS_PLUGIN
+              value: "true"
+          ports:
+            - containerPort: 5601
+              name: http
+              protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensearch-dashboard-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: opensearch-dashboard-deployment
+  ports:
+    - name: http
+      port: 5601
+      targetPort: http
+      protocol: TCP

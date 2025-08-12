@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+      annotations:
+        "consul.hashicorp.com/connect-inject": 'false'
+    spec:
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:3.13.4-management-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5672
+              name: http
+            - containerPort: 15672
+              name: ui
+            - containerPort: 5552
+              name: stream
+          envFrom:
+            - configMapRef:
+                name: ninetails-env
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - >
+              rabbitmq-plugins enable rabbitmq_stream rabbitmq_stream_management;
+              rabbitmq-server;
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  labels:
+    app: rabbitmq
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 5672
+      targetPort: 5672
+      protocol: TCP
+      name: http
+    - port: 15672
+      targetPort: 15672
+      protocol: TCP
+      name: ui
+    - port: 5552
+      targetPort: 5552
+      protocol: TCP
+      name: stream
+  selector:
+    app: rabbitmq

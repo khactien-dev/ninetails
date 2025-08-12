@@ -1,0 +1,685 @@
+@charset "UTF-8";
+
+/*modal : start*/
+.modalWrap {
+  display: none;
+}
+.modalWrap.active {
+  display: block;
+}
+
+.modalNormal {
+  display: block;
+  width: calc(100% - 40px);
+  background: #fff;
+  border-radius: 20px;
+  padding: 30px;
+  transform: translate(-50%, -50%);
+  position: fixed;
+  z-index: 12000;
+  top: 50%;
+  left: 50%;
+
+  animation-name: modalUp;
+  animation-duration: 0.7s;
+}
+
+.modalNormal.active {
+  display: block;
+}
+
+.modalSize1 {
+  max-width: 400px;
+}
+.modalSize2 {
+  max-width: 500px;
+}
+.modalSize3 {
+  max-width: 700px;
+}
+.modalSize4 {
+  max-width: 900px;
+}
+.modalSize5 {
+  max-width: 1300px;
+}
+
+.modalInside {
+  display: block;
+  width: 100%;
+  padding: 0 50px 0 0;
+  overflow-y: auto;
+  height: calc(100vh - 340px);
+}
+
+.modalInside2 {
+  display: block;
+
+  width: calc(100% + 30px) !important;
+  padding: 0 22px 0 0;
+  overflow-y: scroll;
+  max-height: calc(100vh - 340px);
+}
+
+.processRow + .modalInside2 {
+  margin: 24px 0 0;
+}
+
+.formTxt2 + .modalInside2 {
+  margin: 24px 0 0;
+}
+
+.modalNormal .mdTxt1 {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: #222;
+  line-height: 23px;
+}
+
+.modalNormal .mdTxt2 {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+  color: #222;
+  line-height: 21px;
+}
+
+.modalNormal .mdTxt1 + .mdTxt2 {
+  margin: 7px 0 0;
+}
+
+/*.contentWrap .box{width: 120% !important}
+
+.allWrap .pageTitleRow{width:80% !important}
+
+.boxSubRow .pathRow .pathWrap{width:100% !important}*/
+
+.boxTitle {
+  font-size: 20px;
+  line-height: 20px;
+  font-weight: 700;
+  color: #222;
+}
+
+/*.table .thead .th{width:100px !important; height:50px !important}
+
+.col{background: #f4f5f6; padding:20px; float: left; border-radius: 20px;float: left;}
+
+.boxSubRow{width:400px;}*/
+
+/*.selectNormal{width:90%}
+*/
+
+.dimm {
+  display: block;
+  position: fixed;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  top: 0;
+  left: 0;
+  z-index: 11000;
+  border: none;
+}
+
+.buttonCloseModal {
+  display: block;
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  top: 10px;
+  right: 10px;
+  background: url(../../assets/images/common/close-26-r-b111.png) center no-repeat;
+  background-size: 14px 14px;
+  opacity: 0.7;
+}
+
+.modalTitleRow {
+  display: block;
+  width: 100%;
+}
+
+.modalTitleRow:after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+.modalTitleRow.center {
+  text-align: center;
+}
+
+.modalTitleRow .txt1 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #222;
+  line-height: 26px;
+  text-align: left;
+}
+
+.modalTitle {
+  display: block;
+  text-align: left;
+  font-size: 22px;
+  font-weight: 700;
+  color: #222;
+  line-height: 32px;
+  float: left;
+}
+
+.modalTitle2 {
+  display: block;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: #222;
+  line-height: 22px;
+  margin: 0 0 0 8px;
+}
+
+.modalTitleTxt2 > .t1 {
+  color: #ff2929;
+}
+
+.modalSubTitle {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-size: 14px;
+  line-height: 21px;
+  color: #555;
+  font-weight: 400;
+  margin: 24px 0 0;
+  word-break: break-word;
+}
+
+.modalSubTitle:first-child {
+  margin: 0;
+}
+
+.modalSubTitle .s1 {
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.modalSubTopTitle {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-size: 14px;
+  line-height: 21px;
+  color: #555;
+  font-weight: 400;
+  word-break: break-word;
+  margin: 3px 0 0;
+}
+
+.modalSubTitle2 {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-size: 13px;
+  line-height: 20px;
+  color: #555;
+  font-weight: 400;
+  margin: 40px 0 30px;
+  word-break: break-word;
+}
+
+.modalForm {
+  display: block;
+  width: 100%;
+}
+
+.modalForm:after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+.modalForm .dataWrap:last-child {
+  margin: 0 0 24px;
+}
+/*.modalForm .dataWrap:last-child .inputNormal{margin:0 0 46px} */
+/*inputNormal이 modalForm의 가장 마지막에 있는 경우, 에러메시지를 위한 공간이 필요하다.*/
+
+.modalSubTitle + .modalForm {
+  margin: 24px 0 0;
+}
+
+.modalSubTopTitle + .modalForm {
+  margin: 24px 0 0;
+}
+
+.modalSubTitle + .row {
+  margin: 20px 0 0;
+}
+
+.modalForm > .row {
+  margin: 26px 0 0;
+}
+
+.modalForm > .row:first-child {
+  margin: 0;
+}
+
+.modalNormal .colA0 {
+  display: block;
+  float: left;
+  width: 100%;
+}
+
+.modalNormal .colA01 {
+  display: block;
+  float: left;
+  width: 50%;
+  padding: 0 22px 0 0;
+}
+
+.modalNormal .colA02 {
+  display: block;
+  float: left;
+  width: 50%;
+  padding: 0 0 0 22px;
+}
+
+.modalNormal .colA1 {
+  float: left;
+  display: block;
+  width: calc(50% - 25px);
+  padding: 0;
+  /*margin:32px 0 0;*/
+}
+
+.modalNormal .colA2 {
+  float: left;
+  display: block;
+  width: calc(50% - 25px);
+  padding: 0;
+  margin: 0 0 0 50px;
+  /*margin:32px 0 0 50px;*/
+}
+
+.modalForm .col1in2 {
+  display: block;
+  float: left;
+  width: calc(50% - 10px);
+}
+
+.modalForm .col1in2 + .col1in2 {
+  float: right;
+}
+
+.modalTitleRow + .modalForm {
+  margin: 26px 0 0;
+}
+
+.dataOneGroup {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 24px;
+  row-gap: 24px;
+}
+
+.dataOneGroup + .dataOneGroup {
+  margin: 24px 0 0;
+}
+
+.inputHiddenFile {
+  display: none;
+}
+
+.inputFileLabel {
+  display: block;
+  width: 100%;
+  height: 34px;
+  border-radius: 5px;
+  border: 1px solid #d0d0d0;
+  background: #fff url(../../assets/images/common/upload-d1.png) calc(100% - 13px) no-repeat;
+  background-size: 16px 16px;
+  color: #222;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 32px;
+  padding: 0 28px 0 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.inputFileLabel.disabled {
+  background: #f0f0f0 url(../../assets/images/common/upload-d2.png) calc(100% - 13px) no-repeat;
+  background-size: 16px 16px;
+  cursor: default !important;
+  color: #777;
+}
+
+.admContentWrapType2 .inputFileLabel {
+  background: #fff url(../../assets/images/common/upload-d1a.png) calc(100% - 13px) no-repeat;
+  background-size: 16px 16px;
+}
+
+.buttonCheck {
+  display: block;
+  float: left;
+  height: 20px;
+  line-height: 20px;
+  padding: 0 5px;
+  color: #fff !important;
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+  border-radius: 5px;
+  background: var(/*--green*/ --red);
+  margin: 0 0 0 6px;
+}
+
+.buttonCheck.p2 {
+  padding: 0 13px;
+}
+.buttonCheck.p3 {
+  background: #444;
+}
+.buttonCheck.p4 {
+  background: var(--green);
+}
+
+.dataOne {
+  display: block;
+  width: calc(50% - 12px);
+}
+
+.dataWrap {
+  display: block;
+  width: 100%;
+  position: relative;
+}
+
+.dataWrap:after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+.dataWrap .bToggle {
+  float: left;
+}
+
+.dataLabel {
+  display: block;
+  margin: 24px 0 0;
+}
+
+.dataCol {
+  display: block;
+  width: 50%;
+  float: left;
+  /*margin:50px 0 0;*/
+}
+
+.dataCol:first-child {
+  margin: 0;
+}
+
+.dataCol1in2:nth-child(2n - 1) {
+  padding: 0 22px 0 0;
+}
+
+.dataCol1in2:nth-child(2n) {
+  padding: 0 0 0 22px;
+}
+
+.dataCol1in2:nth-child(2) {
+  margin: 0;
+}
+
+.dataLabel:first-child {
+  margin: 0;
+}
+
+.dataLabel:after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+.dataLabel > .txt {
+  display: block;
+  float: left;
+  font-size: 15px;
+  line-height: 23px;
+  color: #555;
+  padding: 0 0 4px;
+}
+
+.modalForm .dataWrap {
+  position: relative;
+}
+
+.modalForm .dataWrap .errorMessage {
+  display: block;
+  position: absolute;
+  width: 100%;
+  text-align: left;
+  font-size: 12px;
+  line-height: 17px;
+  color: #ff2929;
+  margin: 6px 0 0;
+  font-weight: 500;
+  word-break: break-word;
+  left: 0;
+  top: 32px;
+}
+
+.dataLabel > .star {
+  display: block;
+  float: left;
+  width: 20px;
+  height: 22px;
+  /*background: url(../../assets/images/star001a.png) 3px no-repeat;*/
+  background-size: 8px 8px;
+  margin: 0 0 0 2px;
+}
+
+.inputNormal.error {
+  border: 1px solid #ff2929 !important;
+}
+.inputNormal[readonly] {
+  background: #f0f0f0;
+  color: #777;
+}
+
+.modalButtons {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin: 24px 0 0;
+  line-height: 0;
+  /*float: left;*/
+}
+
+.modalButtons .button1in2new {
+  width: 140px !important;
+}
+.modalButtons .button1in2new.a360b {
+  background: #444 !important;
+}
+.modalButtons .button1in2new + .button1in2new {
+  margin: 0 0 0 24px;
+}
+
+.modalButtons .buttonCancel {
+  float: left;
+}
+
+.modalButtons .buttonDone {
+  display: block;
+  width: 100%;
+  float: left;
+  background: var(--primary-color);
+  height: 40px;
+  border-radius: 5px;
+  text-align: center;
+  line-height: 40px;
+  color: #fff !important;
+  font-size: 16px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.modalButtons button {
+  width: 240px !important;
+}
+/*.modalButtons .inside{width: 100%}*/
+
+.modalButtons .button1in2 {
+  width: calc(50% - 8px) !important;
+}
+
+.modalButtons .button1in2 + .button1in2 {
+  float: right;
+}
+
+.modalTxt1 {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: 700;
+  color: #222;
+}
+
+.modalTxt2 {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-size: 16px;
+  line-height: 25px;
+  font-weight: 500;
+  color: #555;
+  word-break: break-word;
+}
+
+.modalTxt1 + .modalTxt2 {
+  margin: 10px 0 0;
+}
+
+.modalTxt3 {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-size: 14px;
+  line-height: 21px;
+  color: #555;
+  font-weight: 400;
+  word-break: break-word;
+  margin: 10px 0 20px;
+}
+/*modal : end */
+
+@keyframes modalUp {
+  0% {
+    opacity: 0;
+    margin: 30px 0 0;
+  }
+  100% {
+    opacity: 1;
+    margin: 0;
+  }
+}
+
+@-webkit-keyframes modalUp {
+  0% {
+    opacity: 0;
+    margin: 30px 0 0;
+  }
+  100% {
+    opacity: 1;
+    margin: 0;
+  }
+}
+
+/*#######################################*/
+@media screen and (max-width: 1600px) {
+} /*반응형 1600px 끝*/
+
+/*#######################################*/
+@media screen and (max-width: 1500px) {
+} /*반응형 1500px 끝*/
+
+/*#######################################*/
+@media screen and (max-width: 1400px) {
+} /*반응형 1400px 끝*/
+
+/*#######################################*/
+@media screen and (max-width: 1300px) {
+} /*반응형 1300px 끝*/
+
+/*#######################################*/
+@media screen and (max-width: 1200px) {
+} /*반응형 1200px 끝*/
+
+/*#######################################*/
+@media screen and (max-width: 1100px) {
+} /*반응형 1100px 끝*/
+
+/*#######################################*/
+@media screen and (max-width: 1000px) {
+} /*반응형 1000px 끝*/
+
+/*#######################################*/
+@media screen and (max-width: 900px) {
+} /*반응형 900px 끝*/
+
+/*#######################################*/
+@media screen and (max-width: 800px) {
+} /*반응형 800px 끝*/
+
+/*#######################################*/
+@media screen and (max-width: 700px) {
+} /*반응형 700px 끝*/
+
+/*#######################################*/
+@media screen and (max-width: 600px) {
+} /*반응형 600px 끝*/
+
+/*#######################################*/
+@media screen and (max-width: 500px) {
+  .modalButtons .button1in2new {
+    width: 100px !important;
+  }
+  .modalButtons .button1in2new + .button1in2new {
+    margin: 0 0 0 10px;
+  }
+} /*반응형 500px 끝*/
+
+/*#######################################*/
+@media screen and (max-width: 400px) {
+} /*반응형 400px 끝*/
+
+/*#######################################*/
+@media screen and (max-width: 370px) {
+} /*반응형 370px 끝*/
+
+/*#######################################*/
+@media screen and (max-width: 340px) {
+} /*반응형 340px 끝*/
+
+/*#######################################*/
+@media screen and (max-width: 320px) {
+} /*반응형 320px 끝*/
+
+/*#######################################*/
+@media screen and (max-width: 300px) {
+  .modalButtons .button1in2new {
+    width: 90px !important;
+  }
+  .modalButtons .button1in2new + .button1in2new {
+    margin: 0 0 0 8px;
+  }
+} /*반응형 300px 끝*/

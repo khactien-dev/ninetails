@@ -1,0 +1,104 @@
+---
+# Source: api/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: master-api
+  namespace: default
+  labels:
+    helm.sh/chart: api-0.1.0
+    app.kubernetes.io/name: api
+    app.kubernetes.io/instance: master
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+automountServiceAccountToken: true
+---
+# Source: api/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: master-api-service
+  namespace: default
+  labels:
+    helm.sh/chart: api-0.1.0
+    app.kubernetes.io/name: api
+    app.kubernetes.io/instance: master
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3000
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: api
+    app.kubernetes.io/instance: master
+---
+# Source: api/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: master-api
+  namespace: default
+  labels:
+    helm.sh/chart: api-0.1.0
+    app.kubernetes.io/name: api
+    app.kubernetes.io/instance: master
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: api
+      app.kubernetes.io/instance: master
+  template:
+    metadata:
+      annotations:
+        consul.hashicorp.com/connect-service: master-api
+      labels:
+        helm.sh/chart: api-0.1.0
+        app.kubernetes.io/name: api
+        app.kubernetes.io/instance: master
+        app.kubernetes.io/version: "1.16.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      serviceAccountName: master-api
+      containers:
+        - name: api
+          image: "localhost:5000/master-service:latest"
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: ninetails-env
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          livenessProbe:
+            null
+          readinessProbe:
+            null
+---
+# Source: api/templates/servicedefaults.yaml
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: master-api
+  namespace: default
+spec:
+  protocol: "http"
+---
+# Source: api/templates/serviceintentions.yaml
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+metadata:
+  name: master-api-service-intentions
+spec:
+  destination:
+    name: master-api
+  sources:
+    - name: consul-local-gateway
+      action: allow

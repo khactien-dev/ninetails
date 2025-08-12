@@ -1,0 +1,48 @@
+# Configure global settings in this section.
+global:
+  enabled: true
+  name: consul
+  datacenter: dc1
+  # Bootstrap ACLs within Consul. This is highly recommended.
+  acls:
+    manageSystemACLs: true
+
+# Configure your Consul servers in this section.
+server:
+  enabled: true
+  replicas: 1
+  resources:
+    requests:
+      memory: "200Mi"
+      cpu: "100m"
+    limits:
+      memory: '8Gi'
+      cpu: '2'
+
+# Enable and configure the Consul UI.
+ui:
+  enabled: true
+  service:
+    type: "LoadBalancer"
+  port:
+
+
+# Enable Consul connect pod injection
+connectInject:
+  default: true
+  resources:
+    requests:
+      memory: "500Mi"
+      cpu: "250m"
+    limits:
+      memory: "500Mi"
+      cpu: "250m"
+  failurePolicy: "Ignore"
+  initContainer:
+    resources:
+      requests:
+        memory: "150Mi"
+        cpu: "250m"
+      limits:
+        memory: "150Mi"
+        cpu: 500m

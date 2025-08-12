@@ -1,0 +1,21 @@
+FROM node:lts-alpine as build
+
+WORKDIR /usr/src/app
+
+COPY ../../package.json ./package.json
+
+RUN npm install
+
+FROM node:lts-alpine as dev
+
+WORKDIR /usr/src/app
+
+ENV NODE_ENV development
+
+COPY --chown=node:node --from=build /usr/src/app/ .
+
+COPY ../../. .
+
+EXPOSE 3000
+
+CMD ["/bin/sh", "-c", "npm run start:dev notification-service"]

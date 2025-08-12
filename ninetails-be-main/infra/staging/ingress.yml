@@ -1,0 +1,153 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-httproute
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/proxy-body-size: 25m
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+    nginx.ingress.kubernetes.io/proxy_set_header: 'Connection ""'
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - superbucket.kr
+        - www.superbucket.kr
+        - rabbitmq.superbucket.kr
+        - db.superbucket.kr
+        - opensearch.superbucket.kr
+      secretName: ninetails-tls
+  rules:
+    - host: superbucket.kr
+      http:
+        paths:
+          - path: /api/user
+            pathType: Prefix
+            backend:
+              service:
+                name: user-api-service
+                port:
+                  name: http
+          - path: /api/auth
+            pathType: Prefix
+            backend:
+              service:
+                name: master-api-service
+                port:
+                  name: http
+          - path: /api/location
+            pathType: Prefix
+            backend:
+              service:
+                name: location-api-service
+                port:
+                  name: http
+          - path: /api/form-request
+            pathType: Prefix
+            backend:
+              service:
+                name: form-api-service
+                port:
+                  name: http
+          - path: /api/base-metric
+            pathType: Prefix
+            backend:
+              service:
+                name: metric-api-service
+                port:
+                  name: http
+          - path: /api/location
+            pathType: Prefix
+            backend:
+              service:
+                name: location-api-service
+                port:
+                  name: http
+          - path: /api/notification
+            pathType: Prefix
+            backend:
+              service:
+                name: notification-api-service
+                port:
+                  name: http
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ninetails-fe-api-service
+                port:
+                  name: http
+    - host: rabbitmq.superbucket.kr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rabbitmq
+                port:
+                  name: ui
+    - host: www.superbucket.kr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ninetails-fe-api-service
+                port:
+                  name: http
+#    - host: queue.superbucket.kr
+#      http:
+#        paths:
+#          - path: /
+#            pathType: Prefix
+#            backend:
+#              service:
+#                name: rabbitmq
+#                port:
+#                  name: http
+#    - host: stream.superbucket.kr
+#      http:
+#        paths:
+#          - path: /
+#            pathType: Prefix
+#            backend:
+#              service:
+#                name: rabbitmq
+#                port:
+#                  name: stream
+    - host: db.superbucket.kr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pgadmin-service
+                port:
+                  name: http
+    - host: opensearch.superbucket.kr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: opensearch-dashboard-service
+                port:
+                  name: http
+#    - host: cluster.opensearch.superbucket.kr
+#      http:
+#        paths:
+#          - path: /
+#            pathType: Prefix
+#            backend:
+#              service:
+#                name: opensearch
+#                port:
+#                  name: http

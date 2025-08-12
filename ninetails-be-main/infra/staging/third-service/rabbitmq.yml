@@ -1,0 +1,113 @@
+apiVersion: v1
+data:
+  rabbitmq.conf: |
+    # Enable SSL listener on port 5671
+    listeners.ssl.default = 5671
+    
+    # SSL options
+    ssl_options.cacertfile = /etc/rabbitmq/certs/ca_certificate.pem
+    ssl_options.certfile   = /etc/rabbitmq/certs/rabbitmq-server.pem
+    ssl_options.keyfile    = /etc/rabbitmq/certs/rabbitmq-server-key.pem
+    ssl_options.verify     = verify_peer
+    ssl_options.fail_if_no_peer_cert = false
+    
+    # Set the default listener to plain AMQP on port 5672
+    listeners.tcp.default = 5672
+    
+    # Other configurations can be added here
+    management.listener.port = 15672
+    management.listener.ssl = false
+    loopback_users.guest = false
+    log.console = true
+  RABBITMQ_DEFAULT_PASS: "guest"
+  RABBITMQ_DEFAULT_USER: "guest"
+kind: ConfigMap
+metadata:
+  labels:
+    ninetails: env
+  name: rabbitmq-staging-env
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+      annotations:
+        "consul.hashicorp.com/connect-inject": 'false'
+    spec:
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:3.13.4-management-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5672
+              name: http
+            - containerPort: 5671
+              name: ssl
+            - containerPort: 15672
+              name: ui
+            - containerPort: 5552
+              name: stream
+          env:
+            - name: RABBITMQ_DEFAULT_PASS
+              value: 'guest'
+            - name: RABBITMQ_DEFAULT_USER
+              value: 'guest'
+          command: [ "/bin/sh", "-c" ]
+          volumeMounts:
+            - name: rabbitmq-config
+              mountPath: /etc/rabbitmq/conf.d
+            - name: rabbitmq-certs
+              mountPath: /etc/rabbitmq/certs
+              readOnly: true
+          args:
+            - >
+              rabbitmq-plugins enable rabbitmq_stream rabbitmq_stream_management;
+              rabbitmq-server;
+      volumes:
+        - name: rabbitmq-config
+          configMap:
+            name: rabbitmq-staging-env
+        - name: rabbitmq-certs
+          secret:
+            secretName: rabbitmq-certificates
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  labels:
+    app: rabbitmq
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 5672
+      targetPort: 5672
+      protocol: TCP
+      name: http
+    - port: 15672
+      targetPort: 15672
+      protocol: TCP
+      name: ui
+    - port: 5552
+      targetPort: 5552
+      protocol: TCP
+      name: stream
+    - port: 5671
+      targetPort: 5671
+      protocol: TCP
+      name: ssl
+  selector:
+    app: rabbitmq
