@@ -101,12 +101,22 @@ export const HomePageLogin: React.FC<HomePageLoginProps> = ({ toggleOpen }) => {
     event.target.value = value.replace(emojiRegex, '');
   };
 
-  const handlePaste = (event: any) => {
-    const paste = event.clipboardData;
-    const cleanedPaste = paste?.replace(emojiRegex, '');
-    event.preventDefault();
+  // const handlePaste = (event: any) => {
+  //   const paste = event.clipboardData;
+  //   const cleanedPaste = paste?.replace(emojiRegex, '');
+  //   event.preventDefault();
+  //   document.execCommand('insertText', false, cleanedPaste);
+  // };
+
+  const handlePaste = (event: React.ClipboardEvent) => {
+    event.preventDefault();  
+
+    const pastedText = event.clipboardData.getData('text'); 
+    const cleanedPaste = pastedText.replace(emojiRegex, ''); 
+
     document.execCommand('insertText', false, cleanedPaste);
   };
+
 
   return (
     <div className={s.loginArea}>

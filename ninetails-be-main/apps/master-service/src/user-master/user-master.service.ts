@@ -105,16 +105,25 @@ export class UserMasterService {
   }
 
   async findByEmailAndPassword(email: string, password: string) {
+    // const { entities, raw } = await this.userMasterEntity
+    //   .createQueryBuilder('u')
+    //   .addSelect(
+    //     `PGP_SYM_DECRYPT(u.phone_number::bytea, '${this.configService.get('ENCRYPT_KEY')}')`,
+    //     'phone_number',
+    //   )
+    //   .addSelect(
+    //     `PGP_SYM_DECRYPT(u.full_name::bytea, '${this.configService.get('ENCRYPT_KEY')}')`,
+    //     'full_name',
+    //   )
+    //   .leftJoinAndSelect('u.tenant', 't')
+    //   .leftJoinAndSelect('t.contracts', 'c')
+    //   .where(`u.email = '${email.toLocaleLowerCase()}'`)
+    //   .orderBy('c.end_date', 'DESC')
+    //   .limit(1)
+    //   .getRawAndEntities();
+
     const { entities, raw } = await this.userMasterEntity
       .createQueryBuilder('u')
-      .addSelect(
-        `PGP_SYM_DECRYPT(u.phone_number::bytea, '${this.configService.get('ENCRYPT_KEY')}')`,
-        'phone_number',
-      )
-      .addSelect(
-        `PGP_SYM_DECRYPT(u.full_name::bytea, '${this.configService.get('ENCRYPT_KEY')}')`,
-        'full_name',
-      )
       .leftJoinAndSelect('u.tenant', 't')
       .leftJoinAndSelect('t.contracts', 'c')
       .where(`u.email = '${email.toLocaleLowerCase()}'`)
@@ -456,24 +465,39 @@ export class UserMasterService {
     },
     checkNotFound = true,
   ) {
+    // const queryBuilder = this.userMasterEntity
+    //   .createQueryBuilder('um')
+    //   .addSelect(
+    //     `PGP_SYM_DECRYPT(um.full_name::bytea, '${this.configService.get('ENCRYPT_KEY')}')`,
+    //     'full_name',
+    //   )
+    //   .addSelect(
+    //     `PGP_SYM_DECRYPT(um.phone_number::bytea, '${this.configService.get('ENCRYPT_KEY')}')`,
+    //     'phone_number',
+    //   )
+    //   .leftJoinAndSelect('um.tenant', 't');
+    // if (data.phone_number) {
+    //   queryBuilder.where(
+    //     `PGP_SYM_DECRYPT(um.phone_number::bytea, '${this.configService.get('ENCRYPT_KEY')}') = '${data.phone_number}'`,
+    //   );
+    // } else {
+    //   queryBuilder.where(
+    //     `um.${Object.keys(data)[0]} = '${Object.values(data)[0]}'`,
+    //   );
+    // }
     const queryBuilder = this.userMasterEntity
       .createQueryBuilder('um')
-      .addSelect(
-        `PGP_SYM_DECRYPT(um.full_name::bytea, '${this.configService.get('ENCRYPT_KEY')}')`,
-        'full_name',
-      )
-      .addSelect(
-        `PGP_SYM_DECRYPT(um.phone_number::bytea, '${this.configService.get('ENCRYPT_KEY')}')`,
-        'phone_number',
-      )
       .leftJoinAndSelect('um.tenant', 't');
-    if (data.phone_number) {
-      queryBuilder.where(
-        `PGP_SYM_DECRYPT(um.phone_number::bytea, '${this.configService.get('ENCRYPT_KEY')}') = '${data.phone_number}'`,
-      );
+
+    // Check if data.email exists and is not null
+    if (data.email) {
+      // Use a direct where clause on the plaintext 'um.email' field
+      queryBuilder.where(`um.email = :email`, { email: data.email });
     } else {
+      // Fallback for other potential queries, assuming the field is plaintext
       queryBuilder.where(
-        `um.${Object.keys(data)[0]} = '${Object.values(data)[0]}'`,
+        `um.${Object.keys(data)[0]} = :value`,
+        { value: Object.values(data)[0] }
       );
     }
     const raw = await queryBuilder.getRawOne();

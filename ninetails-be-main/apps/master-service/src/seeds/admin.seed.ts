@@ -6,7 +6,6 @@ import { DataSource } from 'typeorm';
 
 const SUPER_ADMIN_EMAIL = process.env.SUPER_ADMIN_EMAIL;
 const SUPER_ADMIN_DEFAULT_PASSWORD = process.env.SUPER_ADMIN_DEFAULT_PASSWORD;
-
 @Injectable()
 export class AdminSeed {
   private readonly logger = new Logger(AdminSeed.name);
@@ -14,6 +13,10 @@ export class AdminSeed {
     private readonly userMasterService: UserMasterService,
     private dataSource: DataSource,
   ) {}
+
+  async onModuleInit() {
+    await this.create();
+  }
 
   async create() {
     try {

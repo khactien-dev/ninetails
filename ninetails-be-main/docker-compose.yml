@@ -22,7 +22,7 @@ services:
      - ./docker/pgData:/var/lib/postgresql/data
      - ./docker/export:/var/lib/postgresql/export
     env_file:
-      - .dev.env
+      - .env
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=root
@@ -50,7 +50,7 @@ services:
       - '5672:5672'
       - '15672:15672'
     env_file:
-      - .dev.env
+      - .env
     networks:
       - ninetail-network
     command: >
@@ -63,7 +63,7 @@ services:
     image: opensearchproject/opensearch:latest
     container_name: opensearch
     env_file:
-      - .dev.env
+      - .env
     ulimits:
       memlock:
         soft: -1
@@ -87,7 +87,7 @@ services:
     expose:
       - "5601"
     env_file:
-      - .dev.env
+      - .env
     depends_on:
       - opensearch
     networks:
@@ -105,7 +105,7 @@ services:
       - ./apps:/usr/src/app/apps
       - ./libs:/usr/src/app/libs
     env_file:
-      - .dev.env
+      - .env
     ports:
       - '3001:3000'
     depends_on:
@@ -123,7 +123,7 @@ services:
       - ./apps:/usr/src/app/apps
       - ./libs:/usr/src/app/libs
     env_file:
-      - .dev.env
+      - .env
     ports:
       - '3003:3000'
     depends_on:
@@ -140,7 +140,7 @@ services:
       - ./apps:/usr/src/app/apps
       - ./libs:/usr/src/app/libs
     env_file:
-      - .dev.env
+      - .env
     ports:
       - '3004:3000'
     depends_on:
@@ -158,7 +158,7 @@ services:
       - ./apps:/usr/src/app/apps
       - ./libs:/usr/src/app/libs
     env_file:
-      - .dev.env
+      - .env
     ports:
       - '3005:3000'
     depends_on:
@@ -178,7 +178,7 @@ services:
       - ./apps:/usr/src/app/apps
       - ./libs:/usr/src/app/libs
     env_file:
-      - .dev.env
+      - .env
     ports:
       - '3006:3000'
     depends_on:
@@ -199,7 +199,7 @@ services:
       - ./libs:/usr/src/app/libs
       - ./docker/export:/var/lib/postgresql/export
     env_file:
-      - .dev.env
+      - .env
     ports:
       - '3007:3000'
     depends_on:
