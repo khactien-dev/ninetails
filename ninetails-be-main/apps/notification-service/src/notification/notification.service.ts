@@ -26,6 +26,8 @@ import { CoreSectionEntity } from 'libs/entities/core-section.entity';
 import { ECORESECTIONTYPE } from 'libs/common/constants/common.constant';
 import {EdgeServeEntity} from "libs/entities/edge-serve.entity";
 const { formatISO } = require('date-fns');
+import * as util from 'util';
+
 
 @Injectable()
 export class NotificationService implements OnModuleInit {
@@ -43,16 +45,84 @@ export class NotificationService implements OnModuleInit {
     this.logger.log(`Notification client initialized with node`);
   }
 
+  // async onModuleInit() {
+  //   try {
+  //     this.client = await this.connectStream();
+  //     const tenants = await this.TenantEntity.find();
+  //     const schemaNames = tenants.map((a) => a.schema);
+  //     const createStreamPromises = [];
+  //     for (const schemaName of schemaNames) {
+  //       if (schemaName == null) {
+  //         continue;
+  //       }
+  //       createStreamPromises.push(
+  //         this.client.createSuperStream({
+  //           streamName: schemaName.toLowerCase(),
+  //           arguments: { 'max-age': '1D' },
+  //         }),
+  //       );
+  //     }
+  //     await Promise.all(createStreamPromises);
+
+  //     const consumerStreamPromises = [];
+  //     for (const schemaName of schemaNames) {
+  //       if (schemaName == null) {
+  //         continue;
+  //       }
+  //       consumerStreamPromises.push(
+  //         this.client.declareSuperStreamConsumer(
+  //           {
+  //             superStream: schemaName.toLowerCase(),
+  //             offset: rabbit.Offset.next(),
+  //             consumerRef: schemaName.toLowerCase(),
+  //           },
+  //           (message) => {
+  //             console.log(JSON.parse(message.content.toString()));
+  //             console.log("message ID :"+ message.messageProperties.messageId);
+  //             this.processMessage(JSON.parse(message.content.toString()), message.messageProperties.messageId);
+  //           },
+  //         ),
+  //       );
+  //     }
+  //     await Promise.all(consumerStreamPromises);
+  //   } catch (e) {
+  //     this.logger.error(`Exception occurred onModuleInit : ${e})`);
+  //   }
+  // }
+  private async connectWithRetry(
+    retries = 5,
+    delayMs = 3000,
+  ): Promise<any> {
+    for (let i = 0; i < retries; i++) {
+      try {
+        this.logger.log(`🔌 Trying to connect to RabbitMQ Stream (attempt ${i + 1}/${retries})...`);
+        const client = await this.connectStream();
+        this.logger.log(`✅ Successfully connected to RabbitMQ Stream!`);
+        return client;
+      } catch (err) {
+        this.logger.error(`❌ Failed to connect to RabbitMQ Stream: ${err}`);
+        if (i < retries - 1) {
+          this.logger.warn(`⏳ Waiting ${delayMs / 1000}s before retrying...`);
+          await new Promise((res) => setTimeout(res, delayMs));
+        } else {
+          throw err;
+        }
+      }
+    }
+  }
+
   async onModuleInit() {
     try {
-      this.client = await this.connectStream();
+      // Retry instead of direct connect
+      this.client = await this.connectWithRetry(10, 5000);
+
       const tenants = await this.TenantEntity.find();
       const schemaNames = tenants.map((a) => a.schema);
+
+      // Create streams
       const createStreamPromises = [];
       for (const schemaName of schemaNames) {
-        if (schemaName == null) {
-          continue;
-        }
+        if (!schemaName) continue;
         createStreamPromises.push(
           this.client.createSuperStream({
             streamName: schemaName.toLowerCase(),
@@ -62,11 +132,10 @@ export class NotificationService implements OnModuleInit {
       }
       await Promise.all(createStreamPromises);
 
+      // Create consumers
       const consumerStreamPromises = [];
       for (const schemaName of schemaNames) {
-        if (schemaName == null) {
-          continue;
-        }
+        if (!schemaName) continue;
         consumerStreamPromises.push(
           this.client.declareSuperStreamConsumer(
             {
@@ -75,18 +144,20 @@ export class NotificationService implements OnModuleInit {
               consumerRef: schemaName.toLowerCase(),
             },
             (message) => {
-              console.log(JSON.parse(message.content.toString()));
-              console.log("message ID :"+ message.messageProperties.messageId);
-              this.processMessage(JSON.parse(message.content.toString()), message.messageProperties.messageId);
+              const data = JSON.parse(message.content.toString());
+              this.logger.debug(`📩 Received message ID: ${message.messageProperties.messageId}`);
+              this.processMessage(data, message.messageProperties.messageId);
             },
           ),
         );
       }
       await Promise.all(consumerStreamPromises);
+
     } catch (e) {
-      this.logger.error(`Exception occurred onModuleInit : ${e})`);
+      this.logger.error(`❌ Exception occurred onModuleInit: ${e}`);
     }
   }
+
 
   async sendMessage(input) {
     const schema = input.schema.toLowerCase();
@@ -374,14 +445,22 @@ export class NotificationService implements OnModuleInit {
   }
 
   async disconnectConsumerById() {
-    const consumers = await this.client.getConsumers();
-    for (const consumer of consumers) {
-      if (consumer.consumer.consumerRef.includes('-')) {
-        const extendedId = consumer.consumer.extendedId;
-        try {
-          await this.client.closeConsumer(extendedId);
-        } catch (e) {}
+    try {
+      const consumers = await this.client.getConsumers();
+
+      for (const consumer of consumers) {
+        if (consumer.consumer.consumerRef.includes('-')) {
+          const extendedId = consumer.consumer.extendedId;
+          try {
+            await this.client.closeConsumer(extendedId);
+            this.logger.log(`✅ Successfully closed consumer with extendedId: ${extendedId}`);
+          } catch (e) {
+            this.logger.error(`❌ Failed to close consumer with extendedId: ${extendedId}, error: ${e}`);
+          }
+        }
       }
+    } catch (err) {
+      this.logger.error(`❌ Exception while disconnecting consumers: ${err}`);
     }
   }
 
