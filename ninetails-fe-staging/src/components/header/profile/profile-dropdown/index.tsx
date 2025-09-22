@@ -16,7 +16,8 @@ export const ProfileDropdown: React.FC = () => {
   const { isTablet } = useResponsive();
   const user = useAppSelector(selectCurrentUser);
   const router = useRouterWithAuthorize();
-
+  console.log(`user`, user);
+  
   return user ? (
     <S.ProfileDropdownHeader as={BaseRow} gutter={[10, 0]} justify="center" align="middle">
       <BaseCol>

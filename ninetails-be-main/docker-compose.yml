@@ -16,11 +16,11 @@ services:
     networks:
       - ninetail-network
   pgDb:
-    image: postgres:alpine
+    image: postgis/postgis:17-3.4
     container_name: pgDb
     volumes:
-     - ./docker/pgData:/var/lib/postgresql/data
-     - ./docker/export:/var/lib/postgresql/export
+    - ./docker/pgData:/var/lib/postgresql/data
+    - ./docker/export:/var/lib/postgresql/export
     env_file:
       - .env
     environment:

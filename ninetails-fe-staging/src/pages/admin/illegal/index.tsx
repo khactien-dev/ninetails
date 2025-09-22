@@ -8,7 +8,7 @@ import { NavermapsProvider } from 'react-naver-maps';
 
 const IllegalPage = () => {
   return (
-    <NavermapsProvider ncpClientId={process.env.NEXT_PUBLIC_NAVER_API_KEY || ''}>
+    <NavermapsProvider ncpClientId={process.env.NEXT_PUBLIC_NAVER_API || ''}>
       <IllegalStatus />
     </NavermapsProvider>
   );

@@ -8,7 +8,7 @@ import { NavermapsProvider } from 'react-naver-maps';
 
 const ControlStatusPage = () => {
   return (
-    <NavermapsProvider ncpClientId={process.env.NEXT_PUBLIC_NAVER_API_KEY || ''}>
+    <NavermapsProvider ncpClientId={process.env.NEXT_PUBLIC_NAVER_API || ''}>
       <ControlStatus />
     </NavermapsProvider>
   );

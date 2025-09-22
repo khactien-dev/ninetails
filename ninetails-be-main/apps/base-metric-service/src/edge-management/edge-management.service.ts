@@ -73,6 +73,8 @@ export class EdgeManagementService {
       schema,
       EdgeServeEntity,
     );
+    console.log('edgeRepositoryTest:', edgeRepositoryTest);
+    
     const edgeServe = await edgeRepositoryTest.findOne({
       where: {
         edge_name: edge_id,
@@ -81,7 +83,8 @@ export class EdgeManagementService {
       },
       relations: ['vehicle'],
     });
-
+    console.log('edgeServe:', edgeServe);
+    
     if (!edgeServe) {
       return {
         topic: 'edge_login_RES',
@@ -113,6 +116,11 @@ export class EdgeManagementService {
       schema,
       WorkingScheduleEntity,
     );
+    console.log('➡️ [dispatchConfirm] workingScheduleRepo:', workingScheduleRepo);
+    console.log('➡️ [dispatchConfirm] dispatchConfirmDtoReq.customer_id:', dispatchConfirmDtoReq.customer_id);
+    console.log('➡️ [dispatchConfirm] dispatchConfirmDtoReq.topic:', dispatchConfirmDtoReq.topic);
+    console.log('➡️ [dispatchConfirm] dispatchConfirmDtoReq.data.vehicle_id:', dispatchConfirmDtoReq.data.vehicle_id);
+    console.log('➡️ [dispatchConfirm] dispatchConfirmDtoReq.data.date:', dispatchConfirmDtoReq.data.date);
     const workingSchedule = await workingScheduleRepo.findOne({
       where: {
         vehicle: {
@@ -127,7 +135,7 @@ export class EdgeManagementService {
         wsDriver: true,
         wsBackupDriver: true,
         wsFieldAgent1: true,
-        wsFieldAgent2: true,
+        wsFieldAgent2: true, 
         wsBackupFieldAgent1: true,
         wsBackupFieldAgent2: true,
       },
@@ -135,6 +143,7 @@ export class EdgeManagementService {
         createdAt: 'desc',
       },
     });
+    console.log('➡️ [dispatchConfirm] workingSchedule:', workingSchedule);
     if (workingSchedule) {
       return {
         customer_id: dispatchConfirmDtoReq.customer_id ?? 'n/a',

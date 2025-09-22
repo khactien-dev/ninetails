@@ -28,6 +28,8 @@ export const HomeHeader: React.FC<HomePageHeaderProps> = ({
 }) => {
   const router = useRouter();
   const user = useAppSelector(selectCurrentUser);
+  console.log(`user`, user);
+  
   const dispatch = useAppDispatch();
   const { notification } = useFeedback();
   const getAccessibleRoutes = (permissions: Record<string, string>): Record<string, string> => {
@@ -104,8 +106,8 @@ export const HomeHeader: React.FC<HomePageHeaderProps> = ({
               </Link>
             </div>
             <button className={`${s.headerLogin}`} type="button" onClick={handleAuthorize}>
-              <Tooltip placement="topRight" title={user ? user.full_name : ''}>
-                <span>{isEmpty(user) ? '로그인' : subString(user.full_name, 5)}</span>
+              <Tooltip placement="topRight" title={user ? user.email : ''}>
+                <span>{isEmpty(user) ? '로그인' : subString(user.email, 5)}</span>
               </Tooltip>
             </button>
             {isEmpty(user) ? (
@@ -114,7 +116,7 @@ export const HomeHeader: React.FC<HomePageHeaderProps> = ({
               </button>
             ) : (
               <button className={`${s.loggedHeaderMenu}`} type="button" onClick={handleAuthorize}>
-                <span>{user ? subString(user?.full_name, 15) : '로그인'}</span>
+                <span>{user ? subString(user?.email, 15) : '로그인'}</span>
               </button>
             )}
           </div>

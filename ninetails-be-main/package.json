@@ -63,6 +63,7 @@
     "pino-elasticsearch": "^8.0.0",
     "pino-http": "^10.2.0",
     "rabbitmq-stream-js-client": "^0.4.2",
+    "react-naver-maps": "^0.1.4",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "slugify": "^1.6.6",

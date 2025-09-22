@@ -17,8 +17,8 @@ jobs:
           touch .env.staging
           echo NEXT_PUBLIC_NODE_ENV=development >> .env.staging
           echo NEXT_PUBLIC_API_URL='https://superbucket.kr/api' >> .env.staging
-          echo NEXT_PUBLIC_NAVER_API_KEY=qqdzmppwz8 >> .env.staging
-          echo NEXT_PUBLIC_NAVER_SECRET_KEY=GCCe7f0i351vrDKDm3cm2tMv2HGJRQOKDDPTvzeD >> .env.staging
+          echo NEXT_PUBLIC_NAVER_API=qqdzmppwz8 >> .env.staging
+          echo NEXT_PUBLIC_NAVER_SECRET=GCCe7f0i351vrDKDm3cm2tMv2HGJRQOKDDPTvzeD >> .env.staging
           cat .env.staging
       - name: Prepare Docker build
         uses: docker/setup-buildx-action@v2
