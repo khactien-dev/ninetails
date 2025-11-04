@@ -84,15 +84,15 @@ services:
     container_name: opensearch-dashboards
     ports:
       - 5601:5601
-    expose:
-      - "5601"
     env_file:
       - .env
+    environment:
+      - OPENSEARCH_HOSTS=["http://opensearch:9200"]
     depends_on:
       - opensearch
     networks:
-     - ninetail-network
-
+      - ninetail-network
+      
   #start application
   user-api-service:
     container_name: user-api-service

@@ -42,7 +42,8 @@ export class SingleIngestService {
 
   async singleDataIngestion(input: DataSet): Promise<any> {
     this.logger.log(
-      `Inside singleUpload() Method | Ingesting single data with index ${input.indexName} `,
+      `Inside singleUpload() Method | Ingesting single data with 4 index ${input.indexName} `,
+      `Inside singleUpload() Method | Ingesting single data with 5 index ${input} `,
     );
     try {
       const schema = input.indexName.split('.')[0];
@@ -51,46 +52,56 @@ export class SingleIngestService {
         input.data.data.timestamp,
       ).toISOString();
       if (input.indexName.split('.')[1] === 'drive_metrics') {
+        this.logger.log('Inside singleUpload() Method | Ingesting single data with 4 1');
         const startDay = moment(input.data.data.timestamp)
           .startOf('day')
           .format('YYYY-MM-DDTHH:mm:ss.SSS');
-        const check: IOpenSearchResult = await this.openSearchClient.search({
-          index: input.indexName,
-          body: {
-            query: {
-              bool: {
-                filter: [
-                  {
-                    match_phrase: {
-                      'data.route_id': input.data.data.route_id,
-                    },
-                  },
-                  {
-                    match_phrase: {
-                      change_mode: true,
-                    },
-                  },
-                  {
-                    range: {
-                      'data.timestamp': {
-                        gte: startDay,
-                        format: 'strict_date_optional_time',
+        this.logger.log('Inside singleUpload() Method | Ingesting single data with 4 11 ');
+
+        const check: IOpenSearchResult = await this.openSearchClient
+          .search({
+            index: input.indexName,
+            body: {
+              query: {
+                bool: {
+                  filter: [
+                    { match_phrase: { 'data.route_id': input.data.data.route_id } },
+                    { match_phrase: { change_mode: true } },
+                    {
+                      range: {
+                        'data.timestamp': {
+                          gte: startDay,
+                          format: 'strict_date_optional_time',
+                        },
                       },
                     },
-                  },
-                ],
+                  ],
+                },
               },
+              sort: [{ 'data.timestamp': { order: 'desc' } }],
+              size: 1,
             },
-            sort: [{ 'data.timestamp': { order: 'desc' } }],
-            size: 1,
-          },
-        });
+          })
+          .then((res) => {
+            this.logger.log('🟢 OpenSearch search() completed successfully');
+            return res;
+          })
+          .catch((err) => {
+            this.logger.error(`🔴 OpenSearch search() failed: ${err.message}`);
+            this.logger.error(err.stack);
+            return null;
+          });
+          
+        this.logger.log('Inside singleUpload() Method | Ingesting single data with 4 12 ');
+
         const saveDb = {
           drive_mode: input.data.data.drive_mode,
           section_name: input.data.data.section_name,
           timestamp: input.data.data.timestamp,
           route_id: input.data.data.route_id,
         };
+        this.logger.log('Inside singleUpload() Method | Ingesting single data with 4 2 ');
+
         if (check && check.body.hits.hits[0]) {
           const data = check.body.hits.hits[0];
           if (data._source.data.drive_mode !== input.data.data.drive_mode) {

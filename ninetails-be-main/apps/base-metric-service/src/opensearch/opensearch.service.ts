@@ -149,7 +149,7 @@ export class OpensearchService {
 
   async singleDataIngestion1(input: DataSet): Promise<any> {
     this.logger.log(
-      `Inside singleUpload() Method | Ingesting single data with index ${input.indexName} `,
+      `Inside singleUpload() Method | Ingesting single data with 1 index ${input.indexName} `,
     );
 
     try {
@@ -170,7 +170,7 @@ export class OpensearchService {
 
   async singleDataIngestion2(input: DataSet): Promise<any> {
     this.logger.log(
-      `Inside singleUpload() Method | Ingesting single data with index ${input.indexName} `,
+      `Inside singleUpload() Method | Ingesting single data with 2 index ${input.indexName} `,
     );
 
     try {
@@ -1727,7 +1727,7 @@ export class OpensearchService {
 
   async singleDataIngestionDashboard(input: DataSet): Promise<any> {
     this.logger.log(
-      `Inside singleUpload() Method | Ingesting single data with index ${input.indexName} `,
+      `Inside singleUpload() Method | Ingesting single data with 3 index ${input.indexName} `,
     );
 
     try {

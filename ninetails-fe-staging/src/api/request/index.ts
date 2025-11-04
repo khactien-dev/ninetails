@@ -119,6 +119,26 @@ axiosInstance.interceptors.response.use(
 );
 
 export const request = {
+  // get<ReqType, ResType>(
+  //   url: string,
+  //   params?: ReqType,
+  //   config?: AxiosRequestConfig<ReqType>
+  // ): Promise<ResType> {
+  //   console.log("[Axios GET] URL:", url);
+  //   console.log("[Axios GET] Params:", params);
+  //   console.log("[Axios GET] Config:", config);
+
+  //   return axiosInstance
+  //     .get(url, { params, ...config })
+  //     .then((res) => {
+  //       console.log("[Axios GET] Response:", res.data);
+  //       return res.data as ResType;
+  //     })
+  //     .catch((err) => {
+  //       console.error("[Axios GET] Error:", err);
+  //       throw err;
+  //     });
+  // },
   get<ReqType, ResType>(
     url: string,
     params?: ReqType,

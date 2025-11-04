@@ -2,7 +2,8 @@ export const Config = {
   rabbitmq: {
     user: process.env.RABBITMQ_USER || 'guest',
     password: process.env.RABBITMQ_PASS || 'guest',
-    host: process.env.RABBITMQ_HOST || 'localhost:5672',
+    host: process.env.RABBITMQ_HOST || '192.168.12.10:5672' || 'localhost:5672',
+    // host: process.env.RABBITMQ_HOST || 'localhost:5672',
     queues: [
       'drive_metrics',
       'vehicle_route',

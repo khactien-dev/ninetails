@@ -651,6 +651,7 @@ export class TenantService {
             'vehicle_route',
             'vehicle_info',
             'edge_state',
+            'edge_state_metrics',
             'collect_metrics',
             'illegal_discharges',
             'zscore_rollup',

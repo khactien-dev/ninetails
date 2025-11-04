@@ -1,7 +1,7 @@
 import { Config } from './config/config';
 import * as amqp from 'amqplib/callback_api';
 import { ConfigService } from '@nestjs/config';
-import { Injectable, OnModuleInit, Scope } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit, Scope } from '@nestjs/common';
 import { OpensearchService } from './opensearch/opensearch.service';
 import {
   AmqpConnectionManager,
@@ -32,6 +32,8 @@ export class BaseMetricService implements OnModuleInit {
   private channel;
   private isGeneratingMetrics = false;
 
+  logger: Logger;
+
   constructor(
     @InjectRepository(TenantEntity)
     private TenantEntity: Repository<TenantEntity>,
@@ -39,6 +41,7 @@ export class BaseMetricService implements OnModuleInit {
     private readonly singleIngestService: SingleIngestService,
     private readonly configService: ConfigService,
   ) {
+    this.logger = new Logger();
   }
 
   async onModuleInit() {
@@ -56,9 +59,11 @@ export class BaseMetricService implements OnModuleInit {
     const tenants = await this.TenantEntity.createQueryBuilder('tenant')
       .where({ schema: Not(IsNull()) })
       .getMany();
+    this.logger.log(` RabbitMQ Found ${tenants} tenants with defined schemas.`);
     const schemaNames = tenants.map((a) => a.schema);
   
     for (const schemaName of schemaNames) {
+      this.logger.log(`Setting up RabbitMQ for schema: ${schemaName}`);
       const exchangeName = `${schemaName.toLowerCase()}.exchange`;
   
       this.channelWrapper = this.connection.createChannel({
@@ -83,8 +88,10 @@ export class BaseMetricService implements OnModuleInit {
               } while (!exchange);
   
               for (const queue of Config.rabbitmq.queues) {
+                this.logger.log(`OpenSearch12 Setting up queue: ${queue} for schema: ${schemaName}`);
                 const nameQueue = `${schemaName.toLowerCase()}.${queue}.que`;
                 const indexOpenSearch = `${schemaName.toLowerCase()}.${queue}`;
+                // this.logger.log(`OpenSearch12 Index name1: ${indexOpenSearch}`);
                 const routeKey = `${queue}.key`;
   
                 await channel.assertQueue(nameQueue, { durable: true });
@@ -104,9 +111,13 @@ export class BaseMetricService implements OnModuleInit {
                 } while (!checkQueue);
   
                 await channel.bindQueue(nameQueue, exchangeName, routeKey);
-  
+                this.logger.log(`OpenSearch12 Bound queue ${nameQueue} to exchange ${exchangeName} with routing key ${routeKey}`);
                 channel.consume(nameQueue, (msg) => {
+                  this.logger.log(`OpenSearch12 Consuming messages from queue: ${nameQueue}`);
+                  this.logger.log(`OpenSearch12 Message received: ${msg.content.toString()}`);
                   if (msg) {
+                    this.logger.log(`OpenSearch12 Received message from ${nameQueue}`);
+                    this.logger.log(`OpenSearch12 Message content: ${msg.content.toString()}`);
                     const content = msg.content.toString();
                     const newData = this.isJsonString(content)
                       ? {
@@ -121,6 +132,8 @@ export class BaseMetricService implements OnModuleInit {
                         };
 
                     this.processMessage(indexOpenSearch, newData);
+                    this.logger.log(`OpenSearch12 Processed message for index2: ${indexOpenSearch}`);
+                    this.logger.log(`OpenSearch12 Processed message for data2: ${newData.toString()}`);
                     channel.ack(msg);
                   }
                 });
@@ -173,7 +186,10 @@ export class BaseMetricService implements OnModuleInit {
     try {
       // Giả sử rằng indexName sẽ là tên của hàng đợi, nếu không bạn có thể thay đổi logic này
       const indexName = queue.toLocaleLowerCase();
-
+      this.logger.log(`Processing message for index 4: ${indexName}`);
+      this.logger.log(`Processing message for index 4: ${queue}`);
+      this.logger.log(`Processing message for index 4: ${data}`);
+      this.logger.log(`Processing message for index 4: ${schema}`);
       // Kiểm tra và gửi dữ liệu đến OpenSearch
       if (indexName) {
         if (Array.isArray(data)) {
@@ -198,6 +214,7 @@ export class BaseMetricService implements OnModuleInit {
     try {
       // Giả sử rằng indexName sẽ là tên của hàng đợi, nếu không bạn có thể thay đổi logic này
       const indexName = queue.toLocaleLowerCase();
+      this.logger.log(`Processing message for index 2: ${indexName}`);
       // Kiểm tra và gửi dữ liệu đến OpenSearch
       if (indexName) {
         if (Array.isArray(data)) {
@@ -423,7 +440,8 @@ export class BaseMetricService implements OnModuleInit {
       return;
     }
 
-    const edge_state = await this.generateEdgeState();
+    // const edge_state = await this.generateEdgeState();
+    const edge_state_metrics  = await this.generateEdgeState();
 
     for (let i = 0; i < routeId.length; i++) {
       const vehicle_info = {
@@ -511,7 +529,8 @@ export class BaseMetricService implements OnModuleInit {
         drive_metrics: drive_metrics,
         vehicle_info: vehicle_info,
         route_info: route_info,
-        edge_state: edge_state,
+        // edge_state: edge_state,
+        edge_state_metrics : edge_state_metrics ,
       };
 
       const queuesAndData = Config.rabbitmq.queues.map((queue) => {
@@ -560,11 +579,18 @@ export class BaseMetricService implements OnModuleInit {
                     vehicle_info,
                   ),
                 );
+                // promises.push(
+                //   this.assertAndSendToQueue(
+                //     channel,
+                //     `${customerId[0]}.edge_state`,
+                //     edge_state,
+                //   ),
+                // ); 
                 promises.push(
                   this.assertAndSendToQueue(
                     channel,
-                    `${customerId[0]}.edge_state`,
-                    edge_state,
+                    `${customerId[0]}.edge_state_metrics `,
+                    edge_state_metrics ,
                   ),
                 ); 
                 promises.push(
@@ -625,6 +651,7 @@ export class BaseMetricService implements OnModuleInit {
     const newArray = [
       `${toggleMessageDto.customerId}.drive_metrics`,
       `${toggleMessageDto.customerId}.collect_metrics`,
+      `${toggleMessageDto.customerId}.edge_state_metrics`,
       `${toggleMessageDto.customerId}.vehicle_info`,
       `${toggleMessageDto.customerId}.edge_state`,
       `${toggleMessageDto.customerId}.zscore_rollup`,

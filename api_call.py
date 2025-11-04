@@ -1,16 +1,17 @@
 import requests
 
 payload = {
-    "customer_id": "skt1",
+    "customer_id": "abc1",
     "topic": "edge_login_REQ",
     "data": {
         "edge_id": "Edge_Test_1",
-        "password": "olj0y82p",
-        "mac_address": "02:7A:4B:2C:8D:9E"
+        "password": "xip9il4s",
+        "mac_address": "00:1A:2B:3C:4D:6E"
     }
 }
 
-BASE_URL = 'http://localhost:3000/api/base-metric/edge-management'
+
+BASE_URL = 'http://192.168.12.10:3000/api/base-metric/edge-management'
 full_url = f'{BASE_URL}/auth'
 
 try:
