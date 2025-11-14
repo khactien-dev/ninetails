@@ -2,7 +2,7 @@ FROM node:lts-alpine as build
 
 WORKDIR /usr/src/app
 
-COPY ../../package.json ./package.json
+COPY package.json ./package.json
 
 RUN npm install
 
@@ -10,7 +10,7 @@ FROM node:lts-alpine AS production
 WORKDIR /usr/src/app
 ENV NODE_ENV production
 COPY --chown=node:node --from=build /usr/src/app/ .
-COPY ../../. .
+COPY . .
 RUN npm run build form-request-service
 EXPOSE 3000
 

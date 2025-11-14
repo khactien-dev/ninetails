@@ -45,8 +45,8 @@ export const ProfileDropdown: React.FC = () => {
                 <span className="company">{user ? user.organization : ''}</span>
               </Tooltip>
               <Tooltip placement="topRight" title={user ? user.full_name + ' 님' : ''}>
-                {/* <span>{subString(user?.full_name, 15)} 님</span> */}
-                <span>Super admin</span>
+                <span>{subString(user?.full_name, 15)} 님</span>
+                {/* <span>Super admin</span> */}
               </Tooltip>
               <span className="email">( {user.email} )</span>
             </>

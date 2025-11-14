@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start -p 3333",
+    "dev": "node init && next dev",
+    "build": "node init && next build",
+    "start": "node init && next start -p 3333",
     "lint": "next lint",
     "lint:check": "eslint . --ext ts --ext tsx --ext js",
     "lint:fix": "eslint . --ext .ts,.tsx,.js --fix && stylelint '**/*.css' --fix",
